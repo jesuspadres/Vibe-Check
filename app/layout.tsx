@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
-import { GeistSans } from "geist/font/sans";
-import { GeistMono } from "geist/font/mono";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Vibe Check | Brand Auditor",
+  title: "Vibe Check | Brand Voice Auditor",
   description:
-    "Audit your brand's linguistic consistency across platforms. Analyze voice, tone, and persona coherence.",
+    "A thoughtful analysis of your brand's linguistic consistency across platforms.",
   keywords: ["brand audit", "voice analysis", "tone consistency", "brand identity"],
-  authors: [{ name: "Vibe Check" }],
+  authors: [{ name: "Vibe Check Studio" }],
   openGraph: {
-    title: "Vibe Check | Brand Auditor",
-    description: "Audit your brand's linguistic consistency across platforms.",
+    title: "Vibe Check | Brand Voice Auditor",
+    description: "A thoughtful analysis of your brand's linguistic consistency across platforms.",
     type: "website",
   },
 };
@@ -22,26 +20,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body
-        className={`${GeistSans.variable} ${GeistMono.variable} font-sans min-h-screen bg-zinc-950`}
-      >
-        {/* Background layers */}
-        <div className="fixed inset-0 -z-10">
-          {/* Gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950" />
-          
-          {/* Radial gradient accent */}
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(6,182,212,0.08)_0%,_transparent_50%)]" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,_rgba(168,85,247,0.05)_0%,_transparent_50%)]" />
-          
-          {/* Grid pattern */}
-          <div className="absolute inset-0 grid-pattern opacity-30" />
-          
-          {/* Noise texture */}
-          <div className="noise-overlay" />
-        </div>
-
+    <html lang="en">
+      <body className="min-h-screen bg-stone-50">
+        {/* Subtle paper texture overlay */}
+        <div 
+          className="fixed inset-0 pointer-events-none opacity-[0.02] z-50"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+          }}
+        />
+        
         {/* Main content */}
         <main className="relative">
           {children}

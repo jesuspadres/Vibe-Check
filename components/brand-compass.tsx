@@ -11,7 +11,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
-import { type BrandAxisScore, type BrandAnalysisResult } from "@/lib/validation";
+import { type BrandAxisScore } from "@/lib/validation";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 
 interface BrandCompassProps {
@@ -21,55 +21,80 @@ interface BrandCompassProps {
 
 interface RadarDataPoint {
   axis: string;
+  axisShort: string;
   website: number;
   social: number;
   fullMark: number;
 }
 
-// Custom tooltip component
 function CustomTooltip({ active, payload }: any) {
   if (!active || !payload?.length) return null;
 
+  const axisName = payload[0]?.payload?.axis;
+  const [leftLabel, rightLabel] = axisName ? axisName.split(" ↔ ") : ["", ""];
+
   return (
-    <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-3 shadow-xl">
-      <p className="text-sm font-medium text-zinc-100 mb-2">{payload[0]?.payload?.axis}</p>
-      {payload.map((entry: any, index: number) => (
-        <div key={index} className="flex items-center gap-2 text-xs">
-          <div
-            className="w-2 h-2 rounded-full"
-            style={{ backgroundColor: entry.color }}
-          />
-          <span className="text-zinc-400">{entry.name}:</span>
-          <span className="text-zinc-100 font-medium">{entry.value}</span>
-        </div>
-      ))}
+    <div className="bg-white border border-stone-200 rounded-sm p-4 shadow-lg max-w-xs">
+      <p className="text-sm font-medium text-zinc-900 mb-1">
+        {axisName}
+      </p>
+      <p className="text-[10px] text-stone-500 mb-3">
+        0 = {leftLabel} · 100 = {rightLabel}
+      </p>
+      {payload.map((entry: any, index: number) => {
+        const value = entry.value;
+        const interpretation = value <= 30 
+          ? `Mostly ${leftLabel.toLowerCase()}` 
+          : value >= 70 
+            ? `Mostly ${rightLabel.toLowerCase()}`
+            : "Balanced";
+        
+        return (
+          <div key={index} className="flex items-center justify-between gap-4 text-xs mb-1.5">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-2 h-2 rounded-full"
+                style={{ backgroundColor: entry.color }}
+              />
+              <span className="text-stone-600">{entry.name}</span>
+            </div>
+            <div className="text-right">
+              <span className="text-zinc-900 font-medium">{value}</span>
+              <span className="text-stone-400 ml-1">({interpretation})</span>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
 export function BrandCompass({ websiteScores, socialScores }: BrandCompassProps) {
-  // Transform scores into radar chart data
   const data: RadarDataPoint[] = [
     {
       axis: "Professional ↔ Casual",
+      axisShort: "Pro → Casual",
       website: websiteScores.professionalCasual,
       social: socialScores.professionalCasual,
       fullMark: 100,
     },
     {
       axis: "Serious ↔ Witty",
+      axisShort: "Serious → Witty",
       website: websiteScores.seriousWitty,
       social: socialScores.seriousWitty,
       fullMark: 100,
     },
     {
       axis: "Modern ↔ Traditional",
+      axisShort: "Modern → Trad",
       website: websiteScores.modernTraditional,
       social: socialScores.modernTraditional,
       fullMark: 100,
     },
     {
       axis: "Direct ↔ Emotive",
+      axisShort: "Direct → Emotive",
       website: websiteScores.directEmotive,
       social: socialScores.directEmotive,
       fullMark: 100,
@@ -78,121 +103,181 @@ export function BrandCompass({ websiteScores, socialScores }: BrandCompassProps)
 
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5 }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6 }}
     >
-      <Card variant="glass">
+      <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span className="text-2xl">🧭</span>
-            Brand Compass
-          </CardTitle>
+          <span className="label-tag mb-4">Voice Mapping</span>
+          <CardTitle className="text-2xl">Brand Compass</CardTitle>
           <CardDescription>
-            Visual comparison of voice attributes across platforms
+            Compare how your brand voice differs between platforms. When the green (website) and amber (social) markers are close together, your voice is consistent.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="radar-container">
-            <ResponsiveContainer width="100%" height={400}>
-              <RadarChart cx="50%" cy="50%" outerRadius="75%" data={data}>
+          {/* Chart container - architectural style */}
+          <div className="relative chart-architectural">
+            <ResponsiveContainer width="100%" height={340}>
+              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
+                <defs>
+                  <linearGradient id="websiteGradientEditorial" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#166534" stopOpacity={0.15} />
+                    <stop offset="100%" stopColor="#166534" stopOpacity={0.05} />
+                  </linearGradient>
+                  <linearGradient id="socialGradientEditorial" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#b45309" stopOpacity={0.15} />
+                    <stop offset="100%" stopColor="#b45309" stopOpacity={0.05} />
+                  </linearGradient>
+                </defs>
                 <PolarGrid
-                  stroke="#3f3f46"
-                  strokeDasharray="3 3"
+                  stroke="#d4d4d4"
+                  strokeWidth={1}
+                  strokeDasharray="2 2"
                 />
                 <PolarAngleAxis
-                  dataKey="axis"
-                  tick={{ fill: "#a1a1aa", fontSize: 12 }}
+                  dataKey="axisShort"
+                  tick={{ 
+                    fill: "#57534e", 
+                    fontSize: 10,
+                    fontFamily: "'Inter', sans-serif",
+                    fontWeight: 500
+                  }}
                   tickLine={false}
                 />
                 <PolarRadiusAxis
                   angle={90}
                   domain={[0, 100]}
-                  tick={{ fill: "#71717a", fontSize: 10 }}
+                  tick={{ fill: "#a1a1aa", fontSize: 9 }}
                   tickCount={5}
                   axisLine={false}
                 />
                 <Radar
                   name="Website"
                   dataKey="website"
-                  stroke="#06b6d4"
-                  fill="#06b6d4"
-                  fillOpacity={0.25}
+                  stroke="#166534"
+                  fill="url(#websiteGradientEditorial)"
                   strokeWidth={2}
                   dot={{
-                    r: 4,
-                    fill: "#06b6d4",
-                    stroke: "#06b6d4",
+                    r: 3,
+                    fill: "#166534",
+                    stroke: "white",
                     strokeWidth: 2,
                   }}
                   activeDot={{
-                    r: 6,
-                    fill: "#06b6d4",
-                    stroke: "#ffffff",
+                    r: 5,
+                    fill: "#166534",
+                    stroke: "white",
                     strokeWidth: 2,
                   }}
                 />
                 <Radar
                   name="Social"
                   dataKey="social"
-                  stroke="#a855f7"
-                  fill="#a855f7"
-                  fillOpacity={0.25}
+                  stroke="#b45309"
+                  fill="url(#socialGradientEditorial)"
                   strokeWidth={2}
                   dot={{
-                    r: 4,
-                    fill: "#a855f7",
-                    stroke: "#a855f7",
+                    r: 3,
+                    fill: "#b45309",
+                    stroke: "white",
                     strokeWidth: 2,
                   }}
                   activeDot={{
-                    r: 6,
-                    fill: "#a855f7",
-                    stroke: "#ffffff",
+                    r: 5,
+                    fill: "#b45309",
+                    stroke: "white",
                     strokeWidth: 2,
                   }}
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend
                   wrapperStyle={{
-                    paddingTop: "20px",
+                    paddingTop: "24px",
                   }}
                   formatter={(value) => (
-                    <span className="text-sm text-zinc-300">{value}</span>
+                    <span className="text-xs text-stone-600 ml-1">{value}</span>
                   )}
                 />
               </RadarChart>
             </ResponsiveContainer>
           </div>
 
-          {/* Axis legend */}
-          <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-zinc-800">
-            {data.map((item, index) => {
+          {/* Axis details - visual spectrum display */}
+          <div className="divider my-8" />
+          
+          <div className="space-y-6">
+            {data.map((item) => {
               const diff = Math.abs(item.website - item.social);
-              const alignment =
-                diff <= 15 ? "High" : diff <= 35 ? "Medium" : "Low";
+              const alignment = diff <= 15 ? "Aligned" : diff <= 35 ? "Moderate Gap" : "Misaligned";
               const alignmentColor =
                 diff <= 15
-                  ? "text-emerald-400"
+                  ? "text-green-800"
                   : diff <= 35
-                  ? "text-amber-400"
-                  : "text-red-400";
+                  ? "text-amber-600"
+                  : "text-red-600";
+              
+              // Get the left and right labels from the axis name
+              const [leftLabel, rightLabel] = item.axis.split(" ↔ ");
 
               return (
                 <div
                   key={item.axis}
-                  className="text-sm p-3 rounded-lg bg-zinc-800/30"
+                  className="p-5 border border-stone-200 rounded-sm bg-white"
                 >
-                  <p className="font-medium text-zinc-300 mb-1">{item.axis}</p>
-                  <div className="flex items-center gap-4 text-xs">
-                    <span className="text-cyan-400">Web: {item.website}</span>
-                    <span className="text-purple-400">Social: {item.social}</span>
-                    <span className={alignmentColor}>({alignment} alignment)</span>
+                  {/* Axis title and alignment status */}
+                  <div className="flex items-center justify-between mb-4">
+                    <p className="text-sm font-medium text-zinc-900">{item.axis}</p>
+                    <span className={`text-[10px] uppercase tracking-wider font-medium ${alignmentColor}`}>
+                      {alignment}
+                    </span>
+                  </div>
+                  
+                  {/* Visual spectrum bar */}
+                  <div className="relative">
+                    {/* Labels */}
+                    <div className="flex justify-between text-[10px] text-stone-500 mb-2">
+                      <span>{leftLabel}</span>
+                      <span>{rightLabel}</span>
+                    </div>
+                    
+                    {/* Spectrum track */}
+                    <div className="relative h-2 bg-stone-100 rounded-full">
+                      {/* Website marker */}
+                      <div 
+                        className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-green-800 border-2 border-white shadow-sm z-10"
+                        style={{ left: `calc(${item.website}% - 6px)` }}
+                        title={`Website: ${item.website}`}
+                      />
+                      {/* Social marker */}
+                      <div 
+                        className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-amber-600 border-2 border-white shadow-sm z-10"
+                        style={{ left: `calc(${item.social}% - 6px)` }}
+                        title={`Social: ${item.social}`}
+                      />
+                    </div>
+                    
+                    {/* Legend */}
+                    <div className="flex items-center justify-center gap-6 mt-3 text-[10px] text-stone-600">
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full bg-green-800" />
+                        <span>Website: {item.website}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full bg-amber-600" />
+                        <span>Social: {item.social}</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               );
             })}
           </div>
+          
+          {/* Explanation */}
+          <p className="text-[11px] text-stone-400 mt-6 text-center">
+            Each axis runs from 0 (left trait) to 100 (right trait). Closer markers = more consistent voice.
+          </p>
         </CardContent>
       </Card>
     </motion.div>

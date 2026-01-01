@@ -6,26 +6,24 @@ import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap font-medium transition-all duration-300 ease-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-stone-50 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-gradient-to-r from-cyan-500 to-purple-500 text-white shadow-lg shadow-cyan-500/20 hover:shadow-cyan-500/40 hover:scale-[1.02] active:scale-[0.98]",
+          "btn-pill-primary",
         secondary:
-          "bg-zinc-800 text-zinc-100 border border-zinc-700 hover:bg-zinc-700 hover:border-zinc-600",
+          "btn-pill-ghost",
         ghost:
-          "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50",
-        outline:
-          "border border-zinc-700 bg-transparent text-zinc-100 hover:bg-zinc-800 hover:border-zinc-600",
-        destructive:
-          "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20",
+          "text-stone-600 hover:text-zinc-900 hover:bg-stone-100 rounded-lg",
+        link:
+          "text-forest underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-11 px-6 py-2",
-        sm: "h-9 px-4 text-xs",
-        lg: "h-14 px-8 text-base",
-        icon: "h-10 w-10",
+        default: "px-8 py-3.5 text-sm tracking-wide",
+        sm: "px-6 py-2.5 text-xs tracking-wide",
+        lg: "px-10 py-4 text-base tracking-wide",
+        icon: "h-10 w-10 rounded-full",
       },
     },
     defaultVariants: {

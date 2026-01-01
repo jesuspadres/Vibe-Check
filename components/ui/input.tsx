@@ -7,26 +7,32 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
   label?: string;
   error?: string;
   leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, label, error, leftIcon, rightIcon, ...props }, ref) => {
+  ({ className, type, label, error, leftIcon, ...props }, ref) => {
     const id = React.useId();
+    const [isFocused, setIsFocused] = React.useState(false);
+    const [hasValue, setHasValue] = React.useState(false);
+
+    const handleFocus = () => setIsFocused(true);
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      setHasValue(e.target.value.length > 0);
+    };
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setHasValue(e.target.value.length > 0);
+      props.onChange?.(e);
+    };
 
     return (
-      <div className="w-full space-y-2">
-        {label && (
-          <label
-            htmlFor={id}
-            className="block text-sm font-medium text-zinc-300"
-          >
-            {label}
-          </label>
-        )}
+      <div className="w-full space-y-1">
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">
+            <div className={cn(
+              "absolute left-0 top-4 transition-colors duration-300",
+              isFocused ? "text-green-800" : "text-stone-400"
+            )}>
               {leftIcon}
             </div>
           )}
@@ -34,38 +40,45 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={id}
             type={type}
             className={cn(
-              "w-full rounded-xl border bg-zinc-900/80 px-4 py-3 text-sm text-zinc-100",
-              "border-zinc-700/50 placeholder:text-zinc-500",
-              "transition-all duration-200",
-              "hover:border-zinc-600",
-              "focus:border-cyan-500/50 focus:outline-none focus:ring-2 focus:ring-cyan-500/20",
-              leftIcon && "pl-11",
-              rightIcon && "pr-11",
-              error && "border-red-500/50 focus:border-red-500/50 focus:ring-red-500/20",
+              "w-full bg-transparent py-4 text-zinc-900",
+              "border-0 border-b-2 border-stone-300",
+              "transition-all duration-300",
+              "focus:outline-none focus:border-green-800",
+              "placeholder:text-transparent",
+              leftIcon && "pl-8",
+              error && "border-red-400 focus:border-red-400",
               className
             )}
             ref={ref}
+            placeholder={label}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            onChange={handleChange}
             {...props}
           />
-          {rightIcon && (
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500">
-              {rightIcon}
-            </div>
+          {label && (
+            <label
+              htmlFor={id}
+              className={cn(
+                "absolute left-0 transition-all duration-300 ease-out pointer-events-none",
+                leftIcon && "left-8",
+                isFocused || hasValue
+                  ? "-top-2 text-xs tracking-widest uppercase"
+                  : "top-4 text-base",
+                isFocused 
+                  ? "text-green-800" 
+                  : hasValue 
+                    ? "text-stone-600" 
+                    : "text-stone-400",
+                error && (isFocused || hasValue) && "text-red-500"
+              )}
+            >
+              {label}
+            </label>
           )}
         </div>
         {error && (
-          <p className="text-xs text-red-400 flex items-center gap-1">
-            <svg
-              className="h-3 w-3"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
+          <p className="text-xs text-red-500 pt-1">
             {error}
           </p>
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Globe, AtSign, Lightbulb, TrendingUp, Quote } from "lucide-react";
+import { Globe, AtSign, Lightbulb } from "lucide-react";
 import { type BrandAnalysisResult } from "@/lib/validation";
 import { interpretCohesionScore } from "@/lib/types";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
@@ -15,158 +15,137 @@ export function VerdictDisplay({ result }: VerdictDisplayProps) {
 
   return (
     <div className="space-y-6">
-      {/* Cohesion Score Hero */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <Card variant="glass" className="relative overflow-hidden">
-          {/* Background gradient based on score */}
-          <div
-            className={`absolute inset-0 opacity-10 ${
-              result.cohesionScore >= 75
-                ? "bg-gradient-to-br from-emerald-500 to-cyan-500"
-                : result.cohesionScore >= 50
-                ? "bg-gradient-to-br from-amber-500 to-orange-500"
-                : "bg-gradient-to-br from-red-500 to-pink-500"
-            }`}
-          />
-
-          <CardContent className="relative pt-8 pb-8">
-            <div className="text-center">
-              {/* Score */}
-              <div className="mb-4">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", bounce: 0.4, delay: 0.2 }}
-                  className="inline-flex items-center justify-center"
-                >
-                  <div className="relative">
-                    <svg className="w-32 h-32" viewBox="0 0 100 100">
-                      {/* Background circle */}
-                      <circle
-                        cx="50"
-                        cy="50"
-                        r="45"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        className="text-zinc-800"
-                      />
-                      {/* Progress circle */}
-                      <motion.circle
-                        cx="50"
-                        cy="50"
-                        r="45"
-                        fill="none"
-                        stroke="url(#scoreGradient)"
-                        strokeWidth="8"
-                        strokeLinecap="round"
-                        strokeDasharray={`${result.cohesionScore * 2.83} 283`}
-                        transform="rotate(-90 50 50)"
-                        initial={{ strokeDasharray: "0 283" }}
-                        animate={{
-                          strokeDasharray: `${result.cohesionScore * 2.83} 283`,
-                        }}
-                        transition={{ duration: 1.5, ease: "easeOut", delay: 0.3 }}
-                      />
-                      <defs>
-                        <linearGradient
-                          id="scoreGradient"
-                          x1="0%"
-                          y1="0%"
-                          x2="100%"
-                          y2="100%"
-                        >
-                          <stop offset="0%" stopColor="#06b6d4" />
-                          <stop offset="100%" stopColor="#a855f7" />
-                        </linearGradient>
-                      </defs>
-                    </svg>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <motion.span
-                        className="text-3xl font-bold text-zinc-100"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.5 }}
-                      >
-                        {result.cohesionScore}
-                      </motion.span>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-
-              {/* Label */}
+      {/* Main Score + Verdict Card */}
+      <Card>
+        <CardContent className="p-10 md:p-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {/* Score Section */}
+            <div className="md:border-r md:border-stone-100 md:pr-10">
+              <span className="label-tag-accent mb-6 inline-block">Cohesion Score</span>
+              
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", bounce: 0.3, delay: 0.2 }}
+                className="relative"
               >
-                <h2 className={`text-2xl font-bold ${cohesionInterpretation.color} mb-2`}>
-                  {cohesionInterpretation.emoji} {cohesionInterpretation.label}
-                </h2>
-                <p className="text-zinc-400 max-w-md mx-auto">
-                  {cohesionInterpretation.description}
-                </p>
+                {/* Score ring */}
+                <div className="relative w-32 h-32 mx-auto md:mx-0">
+                  <svg className="w-full h-full score-ring" viewBox="0 0 100 100">
+                    <circle
+                      cx="50"
+                      cy="50"
+                      r="42"
+                      fill="none"
+                      stroke="#f5f5f4"
+                      strokeWidth="6"
+                    />
+                    <motion.circle
+                      cx="50"
+                      cy="50"
+                      r="42"
+                      fill="none"
+                      stroke="#166534"
+                      strokeWidth="6"
+                      strokeLinecap="round"
+                      strokeDasharray={`${result.cohesionScore * 2.64} 264`}
+                      transform="rotate(-90 50 50)"
+                      initial={{ strokeDasharray: "0 264" }}
+                      animate={{
+                        strokeDasharray: `${result.cohesionScore * 2.64} 264`,
+                      }}
+                      transition={{ duration: 1.2, ease: "easeOut", delay: 0.3 }}
+                    />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <motion.span
+                      className="text-4xl font-serif font-bold text-zinc-900"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.6 }}
+                    >
+                      {result.cohesionScore}
+                    </motion.span>
+                  </div>
+                </div>
+
+                <motion.div 
+                  className="mt-6 text-center md:text-left"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.7 }}
+                >
+                  <h3 className={`text-lg font-serif font-semibold ${
+                    result.cohesionScore >= 75 
+                      ? "text-green-800" 
+                      : result.cohesionScore >= 50 
+                        ? "text-amber-700" 
+                        : "text-red-700"
+                  }`}>
+                    {cohesionInterpretation.label}
+                  </h3>
+                  <p className="text-sm text-stone-500 mt-1">
+                    {cohesionInterpretation.description}
+                  </p>
+                </motion.div>
               </motion.div>
             </div>
-          </CardContent>
-        </Card>
-      </motion.div>
 
-      {/* The Verdict */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <Card variant="glass" className="verdict-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Quote className="h-5 w-5 text-cyan-400" />
-              The Verdict
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-lg text-zinc-200 leading-relaxed italic">
-              &ldquo;{result.verdict}&rdquo;
-            </p>
-          </CardContent>
-        </Card>
-      </motion.div>
+            {/* Verdict Section */}
+            <div className="md:col-span-2">
+              <span className="label-tag mb-6 inline-block">The Verdict</span>
+              
+              <motion.blockquote
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="quote-editorial"
+              >
+                {result.verdict}
+              </motion.blockquote>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Platform Analysis Grid */}
+      {/* Platform Analysis - Side by Side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Website Analysis */}
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card variant="glass">
+          <Card className="h-full">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Globe className="h-5 w-5 text-cyan-400" />
-                Website Voice
-              </CardTitle>
-              <CardDescription>{result.websiteAnalysis.dominantTone}</CardDescription>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center">
+                  <Globe className="h-5 w-5 text-green-800" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Website</CardTitle>
+                  <CardDescription className="text-xs uppercase tracking-wider">
+                    {result.websiteAnalysis.dominantTone}
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-zinc-300 leading-relaxed">
+            <CardContent className="space-y-6">
+              <p className="text-sm text-stone-600 leading-relaxed">
                 {result.websiteAnalysis.voiceSummary}
               </p>
+              
+              <div className="divider" />
+              
               <div>
-                <h4 className="text-xs font-medium text-zinc-500 uppercase mb-2">
+                <h4 className="text-[10px] font-medium text-stone-400 uppercase tracking-widest mb-3">
                   Key Phrases
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {result.websiteAnalysis.keyPhrases.map((phrase, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 text-xs bg-cyan-500/10 text-cyan-300 rounded-md border border-cyan-500/20"
+                      className="px-3 py-1.5 text-xs bg-green-50 text-green-800 rounded-full border border-green-200"
                     >
                       {phrase}
                     </span>
@@ -179,31 +158,40 @@ export function VerdictDisplay({ result }: VerdictDisplayProps) {
 
         {/* Social Analysis */}
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <Card variant="glass">
+          <Card className="h-full">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <AtSign className="h-5 w-5 text-purple-400" />
-                Social Voice
-              </CardTitle>
-              <CardDescription>{result.socialAnalysis.dominantTone}</CardDescription>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                  <AtSign className="h-5 w-5 text-amber-700" />
+                </div>
+                <div>
+                  <CardTitle className="text-lg">Social</CardTitle>
+                  <CardDescription className="text-xs uppercase tracking-wider">
+                    {result.socialAnalysis.dominantTone}
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <p className="text-sm text-zinc-300 leading-relaxed">
+            <CardContent className="space-y-6">
+              <p className="text-sm text-stone-600 leading-relaxed">
                 {result.socialAnalysis.voiceSummary}
               </p>
+              
+              <div className="divider" />
+              
               <div>
-                <h4 className="text-xs font-medium text-zinc-500 uppercase mb-2">
+                <h4 className="text-[10px] font-medium text-stone-400 uppercase tracking-widest mb-3">
                   Key Phrases
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {result.socialAnalysis.keyPhrases.map((phrase, index) => (
                     <span
                       key={index}
-                      className="px-2 py-1 text-xs bg-purple-500/10 text-purple-300 rounded-md border border-purple-500/20"
+                      className="px-3 py-1.5 text-xs bg-amber-50 text-amber-700 rounded-full border border-amber-200"
                     >
                       {phrase}
                     </span>
@@ -215,61 +203,45 @@ export function VerdictDisplay({ result }: VerdictDisplayProps) {
         </motion.div>
       </div>
 
-      {/* Brand Persona */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.5 }}
-      >
-        <Card variant="glass">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-pink-400" />
-              Brand Persona
-            </CardTitle>
-            <CardDescription>
-              Your brand&apos;s personality in a nutshell
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-zinc-200 leading-relaxed">{result.brandPersona}</p>
-          </CardContent>
-        </Card>
-      </motion.div>
-
       {/* Recommendations */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <Card variant="glass">
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-amber-400" />
-              Recommendations
-            </CardTitle>
-            <CardDescription>
-              Actionable steps to improve brand cohesion
-            </CardDescription>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-stone-100 flex items-center justify-center">
+                <Lightbulb className="h-5 w-5 text-stone-600" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Recommendations</CardTitle>
+                <CardDescription>
+                  Actionable steps to improve brand cohesion
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-3">
+            <ol className="space-y-4">
               {result.recommendations.map((rec, index) => (
                 <motion.li
                   key={index}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.7 + index * 0.1 }}
-                  className="flex items-start gap-3"
+                  className="flex items-start gap-4"
                 >
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-amber-500/10 text-amber-400 flex items-center justify-center text-xs font-medium">
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-stone-100 text-stone-500 flex items-center justify-center text-xs font-medium">
                     {index + 1}
                   </span>
-                  <span className="text-sm text-zinc-300">{rec}</span>
+                  <span className="text-sm text-stone-600 leading-relaxed pt-1">
+                    {rec}
+                  </span>
                 </motion.li>
               ))}
-            </ul>
+            </ol>
           </CardContent>
         </Card>
       </motion.div>

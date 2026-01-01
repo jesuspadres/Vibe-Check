@@ -10,7 +10,7 @@ const redis = new Redis({
 // Rate limiter: 3 requests per hour per IP
 export const rateLimiter = new Ratelimit({
   redis,
-  limiter: Ratelimit.slidingWindow(3, "1 h"),
+  limiter: Ratelimit.slidingWindow(15, "1 h"),
   analytics: true,
   prefix: "vibe-check-audit",
 });
@@ -22,7 +22,7 @@ class InMemoryRateLimiter {
   private maxRequests: number;
   private windowMs: number;
 
-  constructor(maxRequests: number = 3, windowMs: number = 60 * 60 * 1000) {
+  constructor(maxRequests: number = 15, windowMs: number = 60 * 60 * 1000) {
     this.maxRequests = maxRequests;
     this.windowMs = windowMs;
   }
@@ -73,7 +73,7 @@ class InMemoryRateLimiter {
 
   private cleanup() {
     const now = Date.now();
-    for (const [key, value] of this.requests.entries()) {
+    for (const [key, value] of Array.from(this.requests.entries())) {
       if (now >= value.resetTime) {
         this.requests.delete(key);
       }

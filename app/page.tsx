@@ -8,8 +8,7 @@ import { BrandCompass } from "@/components/brand-compass";
 import { VerdictDisplay } from "@/components/verdict-display";
 import { type BrandAuditRequest, type BrandAnalysisResult } from "@/lib/validation";
 import { type AnalysisPhase } from "@/lib/types";
-import { RefreshCw, Github } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function Home() {
   const [analysisPhase, setAnalysisPhase] = useState<AnalysisPhase>("idle");
@@ -42,7 +41,6 @@ export default function Home() {
     setAnalysisPhase("validating");
     setProgress(5);
 
-    // Start progress simulation
     simulateProgress();
 
     try {
@@ -63,7 +61,6 @@ export default function Home() {
         throw new Error(responseData.message || "Failed to analyze brand");
       }
 
-      // Wait a bit to show the final progress state
       setTimeout(() => {
         setProgress(100);
         setAnalysisPhase("complete");
@@ -88,21 +85,26 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-xl">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-stone-50/80 backdrop-blur-md border-b border-stone-200">
+        <div className="max-w-6xl mx-auto px-8 lg:px-12">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <span className="text-xl font-bold gradient-text">⚡ Vibe Check</span>
+            <div className="flex items-center gap-4">
+              {(analysisPhase === "complete" || analysisPhase === "error") && (
+                <button
+                  onClick={handleReset}
+                  className="p-2 -ml-2 text-stone-400 hover:text-zinc-900 transition-colors"
+                >
+                  <ArrowLeft className="h-5 w-5" />
+                </button>
+              )}
+              <span className="text-lg font-serif font-bold text-zinc-900 tracking-tight">
+                Vibe Check
+              </span>
             </div>
-            <nav className="flex items-center gap-4">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2 text-zinc-400 hover:text-zinc-100 transition-colors"
-              >
-                <Github className="h-5 w-5" />
-              </a>
+            <nav className="flex items-center gap-6">
+              <span className="label-tag">
+                Brand Auditor
+              </span>
             </nav>
           </div>
         </div>
@@ -118,6 +120,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              transition={{ duration: 0.5 }}
             >
               <AuditForm onSubmit={handleSubmit} isLoading={isLoading} />
             </motion.div>
@@ -127,10 +130,11 @@ export default function Home() {
           {isLoading && (
             <motion.div
               key="loading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="py-20 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="py-32 px-8 lg:px-12 max-w-2xl mx-auto"
             >
               <ScanningAnimation phase={analysisPhase} progress={progress} />
             </motion.div>
@@ -140,10 +144,11 @@ export default function Home() {
           {analysisPhase === "error" && error && (
             <motion.div
               key="error"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="py-20 px-4 sm:px-6 lg:px-8 max-w-2xl mx-auto"
+              transition={{ duration: 0.5 }}
+              className="py-32 px-8 lg:px-12 max-w-2xl mx-auto"
             >
               <ErrorDisplay message={error} onRetry={handleReset} />
             </motion.div>
@@ -156,35 +161,80 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="py-12 px-4 sm:px-6 lg:px-8"
+              transition={{ duration: 0.6 }}
+              className="py-16 px-8 lg:px-12"
             >
               <div className="max-w-6xl mx-auto">
-                {/* Reset button */}
-                <div className="flex justify-end mb-6">
-                  <Button
-                    variant="secondary"
-                    onClick={handleReset}
-                    leftIcon={<RefreshCw className="h-4 w-4" />}
-                  >
-                    Audit Another Brand
-                  </Button>
-                </div>
+                {/* Results Header */}
+                <motion.div 
+                  className="text-center mb-16"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.1, duration: 0.6 }}
+                >
+                  <span className="label-tag-accent mb-4 inline-block">
+                    Analysis Complete
+                  </span>
+                  <h1 className="text-4xl md:text-5xl font-serif font-bold text-zinc-900 tracking-tight mt-4">
+                    Brand Voice Report
+                  </h1>
+                </motion.div>
 
-                {/* Results Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Left Column - Radar Chart */}
-                  <div className="lg:sticky lg:top-24 lg:self-start">
+                {/* Bento Grid Results */}
+                <div className="bento-grid">
+                  {/* Cohesion Score - Featured */}
+                  <motion.div 
+                    className="bento-item-full"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.6 }}
+                  >
+                    <VerdictDisplay result={result} />
+                  </motion.div>
+
+                  {/* Radar Chart */}
+                  <motion.div 
+                    className="bento-item-half"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.6 }}
+                  >
                     <BrandCompass
                       websiteScores={result.websiteAnalysis.scores}
                       socialScores={result.socialAnalysis.scores}
                     />
-                  </div>
+                  </motion.div>
 
-                  {/* Right Column - Verdict & Details */}
-                  <div>
-                    <VerdictDisplay result={result} />
-                  </div>
+                  {/* Brand Persona */}
+                  <motion.div 
+                    className="bento-item-half"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.4, duration: 0.6 }}
+                  >
+                    <div className="bg-white border border-stone-200 rounded-sm p-10 shadow-editorial">
+                      <span className="label-tag mb-6 inline-block">Brand Persona</span>
+                      <p className="text-xl font-serif text-zinc-700 leading-relaxed italic">
+                        &ldquo;{result.brandPersona}&rdquo;
+                      </p>
+                    </div>
+                  </motion.div>
                 </div>
+
+                {/* New Audit Button */}
+                <motion.div 
+                  className="text-center mt-16"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.6 }}
+                >
+                  <button
+                    onClick={handleReset}
+                    className="btn-pill-ghost"
+                  >
+                    Analyze Another Brand
+                  </button>
+                </motion.div>
               </div>
             </motion.div>
           )}
@@ -192,16 +242,14 @@ export default function Home() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-800/50 mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
+      <footer className="border-t border-stone-200 mt-32">
+        <div className="max-w-6xl mx-auto px-8 lg:px-12 py-12">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-sm text-stone-500">
             <p>
-              Built with{" "}
-              <span className="text-zinc-400">Next.js</span>,{" "}
-              <span className="text-zinc-400">Claude AI</span>, and a passion for brand consistency
+              A thoughtful approach to brand analysis
             </p>
-            <p>
-              © {new Date().getFullYear()} Vibe Check Brand Auditor
+            <p className="text-xs tracking-wide-plus uppercase text-stone-400">
+              © {new Date().getFullYear()} Vibe Check Studio
             </p>
           </div>
         </div>
